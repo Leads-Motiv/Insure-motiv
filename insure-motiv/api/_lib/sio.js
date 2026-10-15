@@ -46,13 +46,6 @@ function consentTextForLead(lead, config) {
 }
 
 function mapSioLead(lead, config) {
-  if (!Number.isFinite(lead.age) || lead.age <= 0) {
-    throw new SioMappingError(
-      "invalid_age",
-      "A valid applicant age is required for SIO delivery."
-    );
-  }
-
   const meta = {
     landing_page_url: requiredString(lead.page_url, "landing_page_url"),
     originally_created: requiredString(lead.captured_at, "originally_created"),
@@ -62,17 +55,15 @@ function mapSioLead(lead, config) {
     user_agent: requiredString(lead.user_agent, "user_agent")
   };
 
+  // The buyer asks for six contact fields and nothing else. Age, coverage,
+  // street address and city were assumptions and are gone; the agent
+  // qualifies those on the call.
   return {
     data: {
-      product_type: config.productType,
-      applicant_age: lead.age,
-      coverage_amount: requiredString(lead.coverage_amount, "coverage_amount")
+      product_type: config.productType
     },
     meta,
     contact: {
-      address: requiredString(lead.address1, "contact_address"),
-      city: requiredString(lead.city, "contact_city"),
-      date_of_birth: requiredString(lead.date_of_birth, "contact_date_of_birth"),
       email: requiredString(lead.email, "contact_email"),
       first_name: requiredString(lead.first_name, "contact_first_name"),
       ip_address: requiredString(lead.ip, "contact_ip_address"),
