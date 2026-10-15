@@ -1,0 +1,12 @@
+{
+  "name": "insuremotiv-final-expense",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Insure Motiv final expense lead capture and delivery pipeline",
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
