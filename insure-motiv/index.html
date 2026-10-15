@@ -289,86 +289,79 @@
 
   gtag('config', 'G-0TFCXJL0Z8');
 </script>
-<style id="im-form-shell-css">
-/* The GoHighLevel embed reports its height after load and its resizer then
-   sets it inline. Reserving the settled height up front stops the card
-   growing ~375px once the form arrives - this was the page's entire CLS.
-   Measured on the live form: 1027px at >=768px, 1187px at 390px. */
-.im-form-shell {
-  position: relative;
-  min-height: 1187px;
-}
+<style id="im-form-css">
+/* Native final expense form. Replaces the GoHighLevel embed and the skeleton
+   that reserved space for it - fix_cls.py existed only to stop that iframe
+   shifting the layout, and there is no iframe left to shift. */
+.im-form { display: flex; flex-direction: column; gap: 14px; }
+.im-form *, .im-form *::before, .im-form *::after { box-sizing: border-box; }
 
-#inline-h5FNem45vE6b3op3S8TN,
-#inline-h5FNem45vE6b3op3S8TN-2 {
-  min-height: 1187px;
-}
+.im-progress { display: flex; align-items: center; justify-content: space-between;
+  font-size: 13px; font-weight: 700; color: #5C6B76; letter-spacing: .02em; }
+.im-progress-bar { height: 6px; border-radius: 999px; background: #EDE6DC; overflow: hidden; }
+.im-progress-fill { height: 100%; width: 50%; border-radius: inherit;
+  background: linear-gradient(90deg, #12304F, #3E7CB1); transition: width 220ms ease; }
 
-@media (min-width: 768px) {
-  .im-form-shell {
-    min-height: 1027px;
-  }
+.im-step { display: none; flex-direction: column; gap: 14px; }
+.im-step.is-active { display: flex; }
+.im-legend { margin: 0; font-size: 14px; font-weight: 800; color: #12304F; }
+.im-hint { margin: -8px 0 0; font-size: 13px; line-height: 1.45; color: #6B7A85; }
 
-  #inline-h5FNem45vE6b3op3S8TN,
-  #inline-h5FNem45vE6b3op3S8TN-2 {
-    min-height: 1027px;
-  }
-}
+.im-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.im-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.im-field--wide { grid-column: 1 / -1; }
+.im-field label { font-size: 13px; font-weight: 800; color: #12304F; }
+.im-field input, .im-field select {
+  width: 100%; min-height: 52px; padding: 12px 14px; font: inherit; font-size: 16px;
+  color: #12304F; background: #FFFFFF; border: 1px solid #CBBFAE; border-radius: 10px; outline: none; }
+.im-field input:focus, .im-field select:focus {
+  border-color: #12304F; box-shadow: 0 0 0 3px rgba(18, 48, 79, .14); }
+.im-field [aria-invalid="true"] { border-color: #B3261E; box-shadow: 0 0 0 3px rgba(179, 38, 30, .12); }
 
-/* Held space with nothing in it reads as a broken card, so the reserve is
-   filled with the shape of the form until the real one paints over it.
-   The embed hides its iframe until the form reports back, so the skeleton
-   needs no "loaded" signal - it is simply covered when the iframe appears. */
-.im-form-skeleton {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  border-radius: 12px;
-  padding: 22px 0;
-  /* One label + one field, tiled down the full reserve, so the placeholder
-     fills the height instead of leaving dead space under a few bars.
-     background-origin keeps the tiling inside the padding. */
-  background-image:
-    linear-gradient(#ECE7DF 0 13px, transparent 13px),
-    linear-gradient(transparent 0 25px, #F4F1EB 25px 71px, transparent 71px);
-  background-size: 38% 99px, 100% 99px;
-  background-repeat: repeat-y;
-  background-origin: content-box;
-  background-color: #FFFFFF;
-}
+.im-values { margin: 2px 0 0; padding: 0; list-style: none; display: grid; gap: 9px; }
+.im-values li { position: relative; padding-left: 26px; font-size: 14.5px; line-height: 1.5; color: #40515C; }
+.im-values li::before { content: "✓"; position: absolute; left: 0; top: -1px;
+  display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%;
+  background: #2E7D52; color: #FFFFFF; font-size: 11px; font-weight: 900; }
 
-/* The iframe is what covers the skeleton, so it has to win the stack and be
-   opaque. The resizer sets position: relative itself; this adds the layer.
-   The background matters: the GoHighLevel form is transparent, and the footer
-   copy shipped without one, so the skeleton bars showed through the loaded
-   fields. Both cards behind these iframes are white, so white is what the
-   form already renders on - this changes nothing once loaded. */
-#inline-h5FNem45vE6b3op3S8TN,
-#inline-h5FNem45vE6b3op3S8TN-2 {
-  position: relative;
-  z-index: 1;
-  background: #FFFFFF;
-}
+.im-consent { display: flex; gap: 10px; align-items: flex-start;
+  padding: 13px; border: 1px solid #E7E0D6; border-radius: 12px; background: #FBF8F4; }
+.im-consent input { flex: 0 0 auto; width: 19px; height: 19px; margin-top: 2px; accent-color: #12304F; }
+.im-consent label { font-size: 12px; line-height: 1.55; color: #5C6B76; }
+.im-consent a { color: #12304F; font-weight: 700; }
 
-.im-form-skeleton::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(100deg,
-    transparent 20%, rgba(255, 255, 255, 0.75) 50%, transparent 80%);
-  transform: translateX(-100%);
-  /* Bounded: the skeleton stays in the DOM under the loaded form, and an
-     infinite animation there would repaint for the life of the page. */
-  animation: im-form-shimmer 1.4s ease-in-out 10;
-}
+/* Visible while the wording is unsigned. Removing this is part of go-live,
+   together with the buyer name in the consent text and in config.js. */
+.im-consent-draft { margin: 0; padding: 9px 12px; border-left: 3px solid #B3261E;
+  border-radius: 0 8px 8px 0; background: #FDECEA; color: #8C1D18;
+  font-size: 12px; font-weight: 700; line-height: 1.45; }
 
-@keyframes im-form-shimmer {
-  to { transform: translateX(100%); }
-}
+.im-actions { display: flex; gap: 10px; align-items: center; }
+.im-actions .im-next { margin-left: auto; }
+.im-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 56px; padding: 14px 22px; border: 1px solid transparent; border-radius: 12px;
+  font: inherit; font-size: 16px; font-weight: 800; cursor: pointer; transition: transform 150ms ease, box-shadow 150ms ease; }
+.im-btn--primary { color: #FFFFFF; background: linear-gradient(135deg, #C2703A, #D98A4F);
+  box-shadow: 0 10px 24px rgba(194, 112, 58, .26); }
+.im-btn--primary:hover { transform: translateY(-1px); box-shadow: 0 14px 30px rgba(194, 112, 58, .32); }
+.im-btn--ghost { color: #12304F; background: #FFFFFF; border-color: #CBBFAE; }
+.im-btn:disabled { opacity: .65; cursor: wait; transform: none; }
 
-@media (prefers-reduced-motion: reduce) {
-  .im-form-skeleton::after { animation: none; }
+.im-alert { display: none; padding: 11px 13px; border-radius: 10px;
+  background: #FDECEA; color: #8C1D18; font-size: 14px; font-weight: 700; line-height: 1.45; }
+.im-alert.is-visible { display: block; }
+
+.im-done { display: none; text-align: center; padding: 10px 0 4px; }
+.im-done.is-visible { display: block; }
+.im-done-tick { display: grid; place-items: center; width: 60px; height: 60px; margin: 0 auto 14px;
+  border-radius: 50%; background: #E3F2E9; color: #2E7D52; font-size: 27px; font-weight: 900; }
+.im-done h3 { margin: 0 0 7px; font-family: 'Source Serif 4', serif; font-size: 25px; font-weight: 700; color: #12304F; }
+.im-done p { margin: 0; font-size: 15.5px; line-height: 1.55; color: #5C6B76; }
+
+@media (max-width: 560px) {
+  .im-row { grid-template-columns: 1fr; }
+  .im-actions { flex-direction: column-reverse; align-items: stretch; }
+  .im-actions .im-next, .im-actions .im-btn { margin-left: 0; width: 100%; }
 }
 </style>
 </head>
@@ -647,8 +640,6 @@
 }
 </style>
 <script src="assets/fa6c1a4c.js"></script>
-<script src="assets/1710ab34.js"></script>
-<script src="assets/1710ab34.js"></script>
 <style>
   * { box-sizing: border-box; }
   body { margin: 0; background: #FBF8F4; font-family: 'Public Sans', system-ui, sans-serif; color: #1E2A33; -webkit-font-smoothing: antialiased; }
@@ -702,7 +693,104 @@
           <h2 style="margin: 0; font-family: 'Source Serif 4', serif; font-size: clamp(26px, 2.6vw, 31px); line-height: 1.15; font-weight: 700; color: #12304F; letter-spacing: -0.6px;">See What You Qualify For</h2>
           <p style="margin: 0; font-size: 17px; line-height: 1.5; color: #5C6B76;">Free, no obligation. Takes under a minute.</p>
         </div>
-        <div class="im-form-shell"><div class="im-form-skeleton" aria-hidden="true"></div><iframe src="https://api.leadconnectorhq.com/widget/form/h5FNem45vE6b3op3S8TN" id="inline-h5FNem45vE6b3op3S8TN" title="Insure Motiv Final Expense" data-layout="{'id':'INLINE'}" data-trigger-type="alwaysShow" data-trigger-value="" data-activation-type="alwaysActivated" data-activation-value="" data-deactivation-type="neverDeactivate" data-deactivation-value="" data-form-name="Insure Motiv Final Expense" data-height="652" data-layout-iframe-id="inline-h5FNem45vE6b3op3S8TN" data-form-id="h5FNem45vE6b3op3S8TN" style="width: 100%; border: none; border-radius: 12px; background: #FFFFFF; display: block;"></iframe></div>
+        <form class="im-form" id="im-quote-form" novalidate>
+          <div class="im-alert" id="im-error" role="alert" aria-live="assertive"></div>
+
+          <input type="hidden" name="submission_id" id="im-submission-id">
+          <input type="hidden" name="idempotency_key" id="im-idempotency-key">
+          <input type="hidden" name="page_name" value="final_expense_landing">
+          <input type="hidden" name="page_version" value="IM-FE-V2.0.0">
+          <input type="hidden" name="cert" id="im-cert">
+          <input type="hidden" name="landing_page_url" id="im-page-url">
+          <input type="hidden" name="referrer" id="im-referrer">
+          <input type="hidden" name="utm_source" id="im-utm-source">
+          <input type="hidden" name="utm_campaign" id="im-utm-campaign">
+          <input type="hidden" name="utm_content" id="im-utm-content">
+          <div aria-hidden="true" style="position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden">
+            <label for="im-company-website">Leave empty</label>
+            <input id="im-company-website" name="company_website" tabindex="-1" autocomplete="off">
+          </div>
+
+          <div class="im-progress"><span id="im-progress-label">Step 1 of 2</span><span id="im-progress-pct">50%</span></div>
+          <div class="im-progress-bar"><div class="im-progress-fill" id="im-progress-fill"></div></div>
+
+          <section class="im-step is-active" data-step="1">
+            <p class="im-legend">Your date of birth</p>
+            <div class="im-row">
+              <div class="im-field im-field--wide">
+                <label for="im-dob">Date of birth</label>
+                <input type="date" id="im-dob" name="date_of_birth" autocomplete="bday" required>
+                <p class="im-hint">Final expense coverage is written between ages 50 and 85.</p>
+              </div>
+            </div>
+
+            <p class="im-legend">How much coverage are you looking for?</p>
+            <div class="im-row">
+              <div class="im-field im-field--wide">
+                <label for="im-coverage">Coverage amount</label>
+                <select id="im-coverage" name="coverage_amount" required>
+                  <option value="">Select an amount</option>
+                  <option value="5000">$5,000</option><option value="10000">$10,000</option><option value="15000">$15,000</option><option value="20000">$20,000</option><option value="25000">$25,000</option><option value="25000+">More than $25,000</option>
+                </select>
+              </div>
+            </div>
+
+            <ul class="im-values">
+              <li>Your quote is free and there is no obligation to buy.</li>
+              <li>No medical exam is required to get a quote.</li>
+              <li>Takes about a minute, then a licensed agent reviews it.</li>
+            </ul>
+
+            <div class="im-actions">
+              <button class="im-btn im-btn--primary im-next" type="button" data-im-next>Continue</button>
+            </div>
+          </section>
+
+          <section class="im-step" data-step="2">
+            <p class="im-legend">Where should we send your quote?</p>
+            <div class="im-row">
+              <div class="im-field"><label for="im-first">First name</label>
+                <input type="text" id="im-first" name="first_name" autocomplete="given-name" required></div>
+              <div class="im-field"><label for="im-last">Last name</label>
+                <input type="text" id="im-last" name="last_name" autocomplete="family-name" required></div>
+              <div class="im-field"><label for="im-phone">Phone number</label>
+                <input type="tel" id="im-phone" name="phone_primary" autocomplete="tel-national" inputmode="tel" required></div>
+              <div class="im-field"><label for="im-email">Email address</label>
+                <input type="email" id="im-email" name="email" autocomplete="email" required></div>
+              <div class="im-field im-field--wide"><label for="im-address">Street address</label>
+                <input type="text" id="im-address" name="address1" autocomplete="street-address" required></div>
+              <div class="im-field"><label for="im-city">City</label>
+                <input type="text" id="im-city" name="city" autocomplete="address-level2" required></div>
+              <div class="im-field"><label for="im-state">State</label>
+                <select id="im-state" name="state" autocomplete="address-level1" required>
+                  <option value="">Select</option><option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option><option value="AR">AR</option><option value="CA">CA</option><option value="CO">CO</option><option value="CT">CT</option><option value="DE">DE</option><option value="FL">FL</option><option value="GA">GA</option><option value="HI">HI</option><option value="ID">ID</option><option value="IL">IL</option><option value="IN">IN</option><option value="IA">IA</option><option value="KS">KS</option><option value="KY">KY</option><option value="LA">LA</option><option value="ME">ME</option><option value="MD">MD</option><option value="MA">MA</option><option value="MI">MI</option><option value="MN">MN</option><option value="MS">MS</option><option value="MO">MO</option><option value="MT">MT</option><option value="NE">NE</option><option value="NV">NV</option><option value="NH">NH</option><option value="NJ">NJ</option><option value="NM">NM</option><option value="NY">NY</option><option value="NC">NC</option><option value="ND">ND</option><option value="OH">OH</option><option value="OK">OK</option><option value="OR">OR</option><option value="PA">PA</option><option value="RI">RI</option><option value="SC">SC</option><option value="SD">SD</option><option value="TN">TN</option><option value="TX">TX</option><option value="UT">UT</option><option value="VT">VT</option><option value="VA">VA</option><option value="WA">WA</option><option value="WV">WV</option><option value="WI">WI</option><option value="WY">WY</option><option value="DC">DC</option>
+                </select></div>
+              <div class="im-field"><label for="im-zip">ZIP code</label>
+                <input type="text" id="im-zip" name="postal_code" inputmode="numeric" autocomplete="postal-code" maxlength="5" required></div>
+            </div>
+
+            <p class="im-consent-draft" data-im-consent-draft>
+              Draft wording &mdash; awaiting legal sign-off and the buyer name. Leads are
+              held rather than delivered until this is replaced.
+            </p>
+
+            <div class="im-consent">
+              <input type="checkbox" id="im-consent" name="consent" value="yes" required>
+              <label for="im-consent">By checking this box and clicking &ldquo;Get My Free Quote,&rdquo; I provide my electronic signature and consent to receive telephone calls, including calls made using automated dialing technology, an artificial voice, or a prerecorded message, from Insure Motiv, a DBA of Motiv Brands Group, LLC, and from [BUYER LEGAL NAME], regarding final expense life insurance, at the telephone number I provided. I understand these calls may be placed even if my number appears on a Do Not Call registry, and that consent is not required as a condition of purchase. I agree to the <a href="/terms-of-use" target="_blank" rel="noopener">Terms of Use</a> and acknowledge the <a href="/privacy-policy" target="_blank" rel="noopener">Privacy Policy</a>.</label>
+            </div>
+
+            <div class="im-actions">
+              <button class="im-btn im-btn--ghost" type="button" data-im-back>Back</button>
+              <button class="im-btn im-btn--primary im-next" id="im-submit" type="submit">Get My Free Quote</button>
+            </div>
+          </section>
+        </form>
+
+        <div class="im-done" id="im-done">
+          <div class="im-done-tick" aria-hidden="true">✓</div>
+          <h3>Your request is in</h3>
+          <p>A licensed agent will review your information and reach out by phone to go through your options.</p>
+        </div>
         <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #82909A; text-align: center;">Your information is never sold. Licensed agents only.</p>
       </div>
     </div>
@@ -850,7 +938,15 @@
       <div style="background: #FBF8F4; border: 1px solid #E7E0D6; border-radius: 22px; padding: clamp(20px, 2.6vw, 28px); max-width: 500px; width: 100%; justify-self: end; display: flex; flex-direction: column; gap: 14px;">
         <h3 style="margin: 0; font-family: 'Source Serif 4', serif; font-size: 25px; font-weight: 700; color: #12304F;">Start Your Free Quote</h3>
         <div style="width: 100%; border-radius: 8px; background: #FFFFFF;">
-          <div class="im-form-shell"><div class="im-form-skeleton" aria-hidden="true"></div><iframe src="https://api.leadconnectorhq.com/widget/form/h5FNem45vE6b3op3S8TN" title="Insure Motiv Final Expense — Footer" id="inline-h5FNem45vE6b3op3S8TN-2" data-layout="{'id':'INLINE'}" data-trigger-type="alwaysShow" data-trigger-value="" data-activation-type="alwaysActivated" data-activation-value="" data-deactivation-type="neverDeactivate" data-deactivation-value="" data-form-name="Insure Motiv Final Expense" data-height="652" data-layout-iframe-id="inline-h5FNem45vE6b3op3S8TN-2" data-form-id="h5FNem45vE6b3op3S8TN" scrolling="no" style="width: 100%; border: none; border-radius: 8px; display: block;"></iframe></div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <p style="margin:0;font-size:15.5px;line-height:1.55;color:#5C6B76;">
+              Answer two quick questions and a licensed agent reviews your options.
+              Free, no obligation, and no medical exam to get a quote.
+            </p>
+            <a href="#quote" class="im-btn im-btn--primary" style="text-decoration:none;">
+              Get My Free Quote
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -1677,5 +1773,252 @@ class Component extends DCLogic {
 
 </script>
 
+
+<script id="im-quote-form-js">
+(() => {
+  "use strict";
+  if (window.__imQuoteFormBooted) return;
+  window.__imQuoteFormBooted = true;
+
+  const MIN_AGE = 50, MAX_AGE = 85;
+  const ENDPOINT = "/api/lead";
+
+  // The host page re-renders and swaps these nodes out, so every lookup is
+  // done at the moment it is needed. Nothing is cached.
+  const $ = (id) => document.getElementById(id);
+  const form = () => $("im-quote-form");
+  const steps = () => [...document.querySelectorAll(".im-step")];
+  const currentStep = () => {
+    const active = steps().find((s) => s.classList.contains("is-active"));
+    return active ? Number(active.dataset.step) : 1;
+  };
+
+  const session = { openedAt: Date.now(), interactions: 0, sending: false };
+
+  (function loadTrustedForm() {
+    if (document.querySelector('script[src*="trustedform"]')) return;
+    const s = document.createElement("script");
+    s.async = true;
+    s.src = "https://api.trustedform.com/trustedform.js?provide_referrer=false&field=" +
+      encodeURIComponent("xxTrustedFormCertUrl") + "&l=" + Date.now() + Math.random() +
+      "&invert_field_sensitivity=false";
+    document.head.appendChild(s);
+  })();
+
+  const digits = (v) => String(v || "").replace(/\D/g, "");
+  const clean = (v, n = 300) => String(v || "").replace(/[<>]/g, "").replace(/\s+/g, " ").trim().slice(0, n);
+
+  function ageOn(dob, now) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dob)) return 0;
+    const [y, m, d] = dob.split("-").map(Number);
+    let age = now.getFullYear() - y;
+    const md = now.getMonth() + 1 - m;
+    if (md < 0 || (md === 0 && now.getDate() < d)) age -= 1;
+    return age > 0 && age < 130 ? age : 0;
+  }
+
+  /** Re-applied on demand: a re-render resets the picker bounds. */
+  function applyDateBounds() {
+    const dob = $("im-dob");
+    if (!dob || dob.dataset.imBounded === "1") return;
+    const now = new Date();
+    const iso = (d) => d.toISOString().slice(0, 10);
+    dob.max = iso(new Date(now.getFullYear() - MIN_AGE, now.getMonth(), now.getDate()));
+    dob.min = iso(new Date(now.getFullYear() - MAX_AGE - 1, now.getMonth(), now.getDate() + 1));
+    dob.dataset.imBounded = "1";
+  }
+
+  function showError(message) {
+    const box = $("im-error");
+    if (!box) return;
+    box.textContent = message;
+    box.classList.add("is-visible");
+    box.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+  function clearError() { $("im-error") && $("im-error").classList.remove("is-visible"); }
+
+  function showStep(n) {
+    const list = steps();
+    const target = Math.max(1, Math.min(list.length, n));
+    list.forEach((s) => s.classList.toggle("is-active", Number(s.dataset.step) === target));
+    const pct = Math.round((target / list.length) * 100);
+    if ($("im-progress-label")) $("im-progress-label").textContent = `Step ${target} of ${list.length}`;
+    if ($("im-progress-pct")) $("im-progress-pct").textContent = pct + "%";
+    if ($("im-progress-fill")) $("im-progress-fill").style.width = pct + "%";
+    clearError();
+  }
+
+  const MESSAGES = {
+    date_of_birth: "Please enter your date of birth.",
+    coverage_amount: "Please choose a coverage amount.",
+    consent: "Please review and accept the consent disclosure."
+  };
+
+  function validateStep() {
+    const step = steps().find((s) => s.classList.contains("is-active"));
+    if (!step) return false;
+    for (const field of step.querySelectorAll("[required]")) {
+      field.removeAttribute("aria-invalid");
+      if (field.type === "checkbox") {
+        if (!field.checked) { field.setAttribute("aria-invalid", "true"); showError(MESSAGES.consent); return false; }
+        continue;
+      }
+      if (!String(field.value || "").trim()) {
+        field.setAttribute("aria-invalid", "true");
+        showError(MESSAGES[field.name] || "Please complete each field above.");
+        field.focus();
+        return false;
+      }
+      if (!field.checkValidity()) {
+        field.setAttribute("aria-invalid", "true");
+        showError("Please review the highlighted field.");
+        field.focus();
+        return false;
+      }
+    }
+    if (currentStep() === 1) {
+      const dob = $("im-dob");
+      const age = ageOn(dob.value, new Date());
+      if (!age) { dob.setAttribute("aria-invalid", "true"); showError(MESSAGES.date_of_birth); return false; }
+      if (age < MIN_AGE || age > MAX_AGE) {
+        dob.setAttribute("aria-invalid", "true");
+        showError(`Final expense coverage is written between ages ${MIN_AGE} and ${MAX_AGE}.`);
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function syncCertificate() {
+    const field = [...document.querySelectorAll('input[name^="xxTrustedFormCertUrl"]')]
+      .find((f) => String(f.value || "").trim());
+    const cert = clean(field && field.value, 1000);
+    if ($("im-cert")) $("im-cert").value = cert;
+    return cert;
+  }
+
+  function populateTracking() {
+    if (!form() || !$("im-page-url")) return;
+    const q = new URLSearchParams(location.search);
+    const set = (id, value) => { if ($(id)) $(id).value = value; };
+    set("im-page-url", location.href);
+    set("im-referrer", document.referrer);
+    set("im-utm-source", clean(q.get("utm_source"), 180));
+    set("im-utm-campaign", clean(q.get("utm_campaign"), 180));
+    set("im-utm-content", clean(q.get("utm_content"), 180));
+  }
+
+  async function idempotencyKey(submissionId, phone, email) {
+    const source = `${submissionId}|${phone}|${email}`;
+    if (window.crypto && window.crypto.subtle && window.TextEncoder) {
+      const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(source));
+      return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+    }
+    return btoa(source).replace(/[^A-Za-z0-9]/g, "").slice(0, 64);
+  }
+
+  async function submitLead() {
+    if (session.sending || !validateStep()) return;
+
+    if (($("im-company-website") && $("im-company-website").value) ||
+        Date.now() - session.openedAt < 4000 || session.interactions < 2) {
+      showError("Your request could not be verified. Please refresh and try again.");
+      return;
+    }
+
+    const cert = syncCertificate();
+    if (!cert) {
+      showError("The secure consent certificate is still loading. Please wait a moment and submit again.");
+      return;
+    }
+
+    let phone = digits($("im-phone").value);
+    if (phone.length === 11 && phone[0] === "1") phone = phone.slice(1);
+    if (!/^[2-9]\d{2}[2-9]\d{6}$/.test(phone)) {
+      showError("Please enter a valid ten-digit U.S. phone number.");
+      return;
+    }
+
+    const email = clean($("im-email").value, 100).toLowerCase();
+    const submissionId = (crypto.randomUUID && crypto.randomUUID()) ||
+      "im-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 12);
+    if ($("im-submission-id")) $("im-submission-id").value = submissionId;
+    if ($("im-idempotency-key")) $("im-idempotency-key").value = await idempotencyKey(submissionId, phone, email);
+
+    populateTracking();
+    const raw = Object.fromEntries(new FormData(form()).entries());
+    const payload = {
+      ...raw,
+      phone_primary: phone,
+      email,
+      postal_code: digits(raw.postal_code).slice(0, 5),
+      state: clean(raw.state, 2).toUpperCase(),
+      consent_checkbox_checked: raw.consent === "yes",
+      trustedform_cert_url: cert
+    };
+
+    const submit = $("im-submit");
+    session.sending = true;
+    if (submit) { submit.disabled = true; submit.textContent = "Sending…"; }
+    try {
+      const response = await fetch(ENDPOINT, {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ normalized_lead: payload })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || result.success === false) {
+        throw new Error(result.message || "Your request could not be submitted. Please try again.");
+      }
+      form().style.display = "none";
+      const done = $("im-done");
+      if (done) { done.classList.add("is-visible"); done.scrollIntoView({ behavior: "smooth", block: "nearest" }); }
+    } catch (error) {
+      showError(error.message || "Your request could not be submitted. Please try again.");
+    } finally {
+      session.sending = false;
+      const button = $("im-submit");
+      if (button) { button.disabled = false; button.textContent = "Get My Free Quote"; }
+    }
+  }
+
+  // ---- delegated listeners. These survive the host page replacing the form.
+  document.addEventListener("click", (event) => {
+    if (!event.target.closest) return;
+    if (event.target.closest("[data-im-next]")) { event.preventDefault(); if (validateStep()) showStep(currentStep() + 1); return; }
+    if (event.target.closest("[data-im-back]")) { event.preventDefault(); showStep(currentStep() - 1); }
+  });
+
+  document.addEventListener("submit", (event) => {
+    if (event.target && event.target.id === "im-quote-form") { event.preventDefault(); submitLead(); }
+  });
+
+  document.addEventListener("focusin", (event) => {
+    if (event.target && event.target.id === "im-dob") applyDateBounds();
+  });
+
+  document.addEventListener("input", (event) => {
+    const el = event.target;
+    if (!el || !el.closest || !el.closest("#im-quote-form")) return;
+    session.interactions += 1;
+    if (el.id === "im-zip") el.value = digits(el.value).slice(0, 5);
+    if (el.id === "im-phone") {
+      let d = digits(el.value);
+      if (d.length === 11 && d[0] === "1") d = d.slice(1);
+      d = d.slice(0, 10);
+      el.value = d.length > 6 ? `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`
+        : d.length > 3 ? `(${d.slice(0,3)}) ${d.slice(3)}` : d;
+    }
+  });
+
+  // Re-apply anything a re-render wipes, then stop watching once settled.
+  const settle = () => { applyDateBounds(); populateTracking(); };
+  settle();
+  const observer = new MutationObserver(settle);
+  observer.observe(document.documentElement, { childList: true, subtree: true });
+  setTimeout(() => observer.disconnect(), 10000);
+})();
+</script>
 
 </body></html>
