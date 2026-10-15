@@ -10,16 +10,19 @@ const US_STATES = new Set([
   "VT", "VA", "WA", "WV", "WI", "WY", "DC"
 ]);
 
-// Final expense is written for a narrow age band. 50-85 is the common
-// carrier range; no buyer has been named yet, so this is the conservative
-// default and the one number to revisit once the purchase order exists.
-const MIN_AGE = 50;
-const MAX_AGE = 85;
-
-const COVERAGE_AMOUNTS = new Set([
-  "5000", "10000", "15000", "20000", "25000", "25000+"
-]);
-
+/**
+ * The field set is the buyer's, taken from the GoHighLevel form this page
+ * used to embed: first_name, last_name, phone, email, state, postal_code and
+ * a consent box. Nothing else.
+ *
+ * An earlier version of this file also collected date of birth, coverage
+ * amount, street address and city, and gated on an assumed 50-85 age band.
+ * None of that is requested by the buyer. Final expense is a calls-only
+ * product - the agent qualifies age, cover and health on the phone - so
+ * asking for them on a form that promises "under a minute" was friction that
+ * bought nothing, and the age gate would have silently rejected leads the
+ * buyer would have accepted.
+ */
 class PipelineError extends Error {
   constructor(status, code, message, state, fields = []) {
     super(message);
@@ -50,42 +53,6 @@ function normalizePhone(value) {
     : valueDigits;
 }
 
-/** YYYY-MM-DD only. Anything else is treated as absent rather than guessed. */
-function parseDateOfBirth(value) {
-  const text = clean(value, 10);
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(text)) return null;
-  const [year, month, day] = text.split("-").map(Number);
-  const date = new Date(Date.UTC(year, month - 1, day));
-  if (
-    date.getUTCFullYear() !== year ||
-    date.getUTCMonth() !== month - 1 ||
-    date.getUTCDate() !== day
-  ) {
-    return null;
-  }
-  return date;
-}
-
-/** Whole years at `asOf`, or 0 when the date of birth is unusable. */
-function ageFromDateOfBirth(value, asOf) {
-  const born = parseDateOfBirth(value);
-  if (!born) return 0;
-  const reference = asOf instanceof Date ? asOf : new Date();
-  let age = reference.getUTCFullYear() - born.getUTCFullYear();
-  const monthDelta = reference.getUTCMonth() - born.getUTCMonth();
-  if (monthDelta < 0 || (monthDelta === 0 && reference.getUTCDate() < born.getUTCDate())) {
-    age -= 1;
-  }
-  return age > 0 && age < 130 ? age : 0;
-}
-
-function normalizeCoverageAmount(value) {
-  const text = clean(value, 20);
-  if (COVERAGE_AMOUNTS.has(text)) return text;
-  const numeric = digits(text);
-  return COVERAGE_AMOUNTS.has(numeric) ? numeric : "";
-}
-
 function getSourceBody(body) {
   const source = body?.normalized_lead && typeof body.normalized_lead === "object"
     ? body.normalized_lead
@@ -104,9 +71,6 @@ function normalizePage() {
 
 function normalizeLead(body, context) {
   const source = getSourceBody(body);
-  const phone = normalizePhone(source.phone_primary);
-  const dateOfBirth = clean(source.date_of_birth, 10);
-  const age = ageFromDateOfBirth(dateOfBirth, context.now);
   const consentChecked =
     source.consent_checkbox_checked === true ||
     source.consent_given === true ||
@@ -122,19 +86,13 @@ function normalizeLead(body, context) {
     form_version: clean(source.page_version, 40),
     first_name: clean(source.first_name, 45),
     last_name: clean(source.last_name, 45),
-    address1: clean(source.address1, 110),
-    city: clean(source.city, 60),
     state: clean(source.state, 2).toUpperCase(),
     postal_code: digits(source.postal_code).slice(0, 5),
     email: clean(source.email, 100).toLowerCase(),
-    phone_primary: phone,
-    date_of_birth: dateOfBirth,
-    age,
-    coverage_amount: normalizeCoverageAmount(source.coverage_amount),
+    phone_primary: normalizePhone(source.phone_primary),
     cert: clean(source.cert || source.Cert || source.trustedform_cert_url, 1000),
     consent_checkbox_checked: consentChecked,
     company_website: clean(source.company_website, 200),
-    selected_recipient: "",
     subID1: clean(source.subID1 || source.utm_source, 180),
     subID2: clean(source.subID2 || source.utm_campaign, 180),
     subID3: clean(source.subID3 || source.utm_content, 180),
@@ -161,10 +119,7 @@ function validateLead(lead) {
   }
 
   const invalid = [];
-  const required = [
-    "first_name", "last_name", "address1", "city", "state", "postal_code",
-    "email", "phone_primary", "date_of_birth", "coverage_amount"
-  ];
+  const required = ["first_name", "last_name", "state", "postal_code", "email", "phone_primary"];
   for (const field of required) if (!lead[field]) invalid.push(field);
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(lead.email)) invalid.push("email");
   if (!/^[2-9]\d{2}[2-9]\d{6}$/.test(lead.phone_primary)) invalid.push("phone_primary");
@@ -192,19 +147,6 @@ function validateLead(lead) {
   if (!validateTrustedFormUrl(lead.cert)) {
     throw new PipelineError(422, "trustedform_invalid", "The consent certificate is invalid.", "TF_VERIFY_FAILED", ["cert"]);
   }
-
-  if (!lead.age) {
-    throw new PipelineError(422, "date_of_birth_invalid", "A valid date of birth is required.", "INVALID", ["date_of_birth"]);
-  }
-  if (lead.age < MIN_AGE || lead.age > MAX_AGE) {
-    throw new PipelineError(
-      422,
-      "age_not_eligible",
-      `Final expense coverage is available between ages ${MIN_AGE} and ${MAX_AGE}.`,
-      "INVALID",
-      ["date_of_birth"]
-    );
-  }
 }
 
 function cleanIpv4(values) {
@@ -219,16 +161,11 @@ function cleanIpv4(values) {
 
 module.exports = {
   PipelineError,
-  MIN_AGE,
-  MAX_AGE,
-  COVERAGE_AMOUNTS,
-  ageFromDateOfBirth,
+  US_STATES,
   clean,
   cleanIpv4,
-  normalizeCoverageAmount,
   normalizeLead,
   normalizePhone,
-  parseDateOfBirth,
   validateLead,
   validateTrustedFormUrl
 };
