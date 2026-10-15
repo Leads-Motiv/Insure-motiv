@@ -296,14 +296,6 @@
 .im-form { display: flex; flex-direction: column; gap: 14px; }
 .im-form *, .im-form *::before, .im-form *::after { box-sizing: border-box; }
 
-.im-progress { display: flex; align-items: center; justify-content: space-between;
-  font-size: 13px; font-weight: 700; color: #5C6B76; letter-spacing: .02em; }
-.im-progress-bar { height: 6px; border-radius: 999px; background: #EDE6DC; overflow: hidden; }
-.im-progress-fill { height: 100%; width: 50%; border-radius: inherit;
-  background: linear-gradient(90deg, #12304F, #3E7CB1); transition: width 220ms ease; }
-
-.im-step { display: none; flex-direction: column; gap: 14px; }
-.im-step.is-active { display: flex; }
 .im-legend { margin: 0; font-size: 14px; font-weight: 800; color: #12304F; }
 .im-hint { margin: -8px 0 0; font-size: 13px; line-height: 1.45; color: #6B7A85; }
 
@@ -691,7 +683,7 @@
       <div id="quote" style="background: #FFFFFF; border: 1px solid #E7E0D6; border-radius: 22px; box-shadow: 0 18px 44px rgba(18, 48, 79, 0.10); padding: clamp(22px, 3vw, 32px); display: flex; flex-direction: column; gap: 16px; max-width: 500px; width: 100%; justify-self: end;">
         <div style="display: flex; flex-direction: column; gap: 7px;">
           <h2 style="margin: 0; font-family: 'Source Serif 4', serif; font-size: clamp(26px, 2.6vw, 31px); line-height: 1.15; font-weight: 700; color: #12304F; letter-spacing: -0.6px;">See What You Qualify For</h2>
-          <p style="margin: 0; font-size: 17px; line-height: 1.5; color: #5C6B76;">Free, no obligation. Takes under a minute.</p>
+          <p style="margin: 0; font-size: 17px; line-height: 1.5; color: #5C6B76;">Free, no obligation. Six quick details and a licensed agent calls you back.</p>
         </div>
         <form class="im-form" id="im-quote-form" novalidate>
           <div class="im-alert" id="im-error" role="alert" aria-live="assertive"></div>
@@ -699,7 +691,7 @@
           <input type="hidden" name="submission_id" id="im-submission-id">
           <input type="hidden" name="idempotency_key" id="im-idempotency-key">
           <input type="hidden" name="page_name" value="final_expense_landing">
-          <input type="hidden" name="page_version" value="IM-FE-V2.0.0">
+          <input type="hidden" name="page_version" value="IM-FE-V2.1.0">
           <input type="hidden" name="cert" id="im-cert">
           <input type="hidden" name="landing_page_url" id="im-page-url">
           <input type="hidden" name="referrer" id="im-referrer">
@@ -711,79 +703,42 @@
             <input id="im-company-website" name="company_website" tabindex="-1" autocomplete="off">
           </div>
 
-          <div class="im-progress"><span id="im-progress-label">Step 1 of 2</span><span id="im-progress-pct">50%</span></div>
-          <div class="im-progress-bar"><div class="im-progress-fill" id="im-progress-fill"></div></div>
+          <div class="im-row">
+            <div class="im-field"><label for="im-first">First name</label>
+              <input type="text" id="im-first" name="first_name" autocomplete="given-name" required></div>
+            <div class="im-field"><label for="im-last">Last name</label>
+              <input type="text" id="im-last" name="last_name" autocomplete="family-name" required></div>
+            <div class="im-field"><label for="im-phone">Phone number</label>
+              <input type="tel" id="im-phone" name="phone_primary" autocomplete="tel-national" inputmode="tel" required></div>
+            <div class="im-field"><label for="im-email">Email address</label>
+              <input type="email" id="im-email" name="email" autocomplete="email" required></div>
+            <div class="im-field"><label for="im-state">State</label>
+              <select id="im-state" name="state" autocomplete="address-level1" required>
+                <option value="">Select</option><option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option><option value="AR">AR</option><option value="CA">CA</option><option value="CO">CO</option><option value="CT">CT</option><option value="DE">DE</option><option value="FL">FL</option><option value="GA">GA</option><option value="HI">HI</option><option value="ID">ID</option><option value="IL">IL</option><option value="IN">IN</option><option value="IA">IA</option><option value="KS">KS</option><option value="KY">KY</option><option value="LA">LA</option><option value="ME">ME</option><option value="MD">MD</option><option value="MA">MA</option><option value="MI">MI</option><option value="MN">MN</option><option value="MS">MS</option><option value="MO">MO</option><option value="MT">MT</option><option value="NE">NE</option><option value="NV">NV</option><option value="NH">NH</option><option value="NJ">NJ</option><option value="NM">NM</option><option value="NY">NY</option><option value="NC">NC</option><option value="ND">ND</option><option value="OH">OH</option><option value="OK">OK</option><option value="OR">OR</option><option value="PA">PA</option><option value="RI">RI</option><option value="SC">SC</option><option value="SD">SD</option><option value="TN">TN</option><option value="TX">TX</option><option value="UT">UT</option><option value="VT">VT</option><option value="VA">VA</option><option value="WA">WA</option><option value="WV">WV</option><option value="WI">WI</option><option value="WY">WY</option><option value="DC">DC</option>
+              </select></div>
+            <div class="im-field"><label for="im-zip">ZIP code</label>
+              <input type="text" id="im-zip" name="postal_code" inputmode="numeric" autocomplete="postal-code" maxlength="5" required></div>
+          </div>
 
-          <section class="im-step is-active" data-step="1">
-            <p class="im-legend">Your date of birth</p>
-            <div class="im-row">
-              <div class="im-field im-field--wide">
-                <label for="im-dob">Date of birth</label>
-                <input type="date" id="im-dob" name="date_of_birth" autocomplete="bday" required>
-                <p class="im-hint">Final expense coverage is written between ages 50 and 85.</p>
-              </div>
-            </div>
+          <ul class="im-values">
+            <li>Your quote is free and there is no obligation to buy.</li>
+            <li>No medical exam is required to get a quote.</li>
+            <li>A licensed agent reviews your details and calls you back.</li>
+          </ul>
 
-            <p class="im-legend">How much coverage are you looking for?</p>
-            <div class="im-row">
-              <div class="im-field im-field--wide">
-                <label for="im-coverage">Coverage amount</label>
-                <select id="im-coverage" name="coverage_amount" required>
-                  <option value="">Select an amount</option>
-                  <option value="5000">$5,000</option><option value="10000">$10,000</option><option value="15000">$15,000</option><option value="20000">$20,000</option><option value="25000">$25,000</option><option value="25000+">More than $25,000</option>
-                </select>
-              </div>
-            </div>
-
-            <ul class="im-values">
-              <li>Your quote is free and there is no obligation to buy.</li>
-              <li>No medical exam is required to get a quote.</li>
-              <li>Takes about a minute, then a licensed agent reviews it.</li>
-            </ul>
-
-            <div class="im-actions">
-              <button class="im-btn im-btn--primary im-next" type="button" data-im-next>Continue</button>
-            </div>
-          </section>
-
-          <section class="im-step" data-step="2">
-            <p class="im-legend">Where should we send your quote?</p>
-            <div class="im-row">
-              <div class="im-field"><label for="im-first">First name</label>
-                <input type="text" id="im-first" name="first_name" autocomplete="given-name" required></div>
-              <div class="im-field"><label for="im-last">Last name</label>
-                <input type="text" id="im-last" name="last_name" autocomplete="family-name" required></div>
-              <div class="im-field"><label for="im-phone">Phone number</label>
-                <input type="tel" id="im-phone" name="phone_primary" autocomplete="tel-national" inputmode="tel" required></div>
-              <div class="im-field"><label for="im-email">Email address</label>
-                <input type="email" id="im-email" name="email" autocomplete="email" required></div>
-              <div class="im-field im-field--wide"><label for="im-address">Street address</label>
-                <input type="text" id="im-address" name="address1" autocomplete="street-address" required></div>
-              <div class="im-field"><label for="im-city">City</label>
-                <input type="text" id="im-city" name="city" autocomplete="address-level2" required></div>
-              <div class="im-field"><label for="im-state">State</label>
-                <select id="im-state" name="state" autocomplete="address-level1" required>
-                  <option value="">Select</option><option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option><option value="AR">AR</option><option value="CA">CA</option><option value="CO">CO</option><option value="CT">CT</option><option value="DE">DE</option><option value="FL">FL</option><option value="GA">GA</option><option value="HI">HI</option><option value="ID">ID</option><option value="IL">IL</option><option value="IN">IN</option><option value="IA">IA</option><option value="KS">KS</option><option value="KY">KY</option><option value="LA">LA</option><option value="ME">ME</option><option value="MD">MD</option><option value="MA">MA</option><option value="MI">MI</option><option value="MN">MN</option><option value="MS">MS</option><option value="MO">MO</option><option value="MT">MT</option><option value="NE">NE</option><option value="NV">NV</option><option value="NH">NH</option><option value="NJ">NJ</option><option value="NM">NM</option><option value="NY">NY</option><option value="NC">NC</option><option value="ND">ND</option><option value="OH">OH</option><option value="OK">OK</option><option value="OR">OR</option><option value="PA">PA</option><option value="RI">RI</option><option value="SC">SC</option><option value="SD">SD</option><option value="TN">TN</option><option value="TX">TX</option><option value="UT">UT</option><option value="VT">VT</option><option value="VA">VA</option><option value="WA">WA</option><option value="WV">WV</option><option value="WI">WI</option><option value="WY">WY</option><option value="DC">DC</option>
-                </select></div>
-              <div class="im-field"><label for="im-zip">ZIP code</label>
-                <input type="text" id="im-zip" name="postal_code" inputmode="numeric" autocomplete="postal-code" maxlength="5" required></div>
-            </div>
-
-            <p class="im-consent-draft" data-im-consent-draft>
+          <p class="im-consent-draft" data-im-consent-draft>
               Draft wording &mdash; awaiting legal sign-off and the buyer name. Leads are
               held rather than delivered until this is replaced.
             </p>
 
-            <div class="im-consent">
+          <div class="im-consent">
               <input type="checkbox" id="im-consent" name="consent" value="yes" required>
               <label for="im-consent">By checking this box and clicking &ldquo;Get My Free Quote,&rdquo; I provide my electronic signature and consent to receive telephone calls, including calls made using automated dialing technology, an artificial voice, or a prerecorded message, from Insure Motiv, a DBA of Motiv Brands Group, LLC, and from [BUYER LEGAL NAME], regarding final expense life insurance, at the telephone number I provided. I understand these calls may be placed even if my number appears on a Do Not Call registry, and that consent is not required as a condition of purchase. I agree to the <a href="/terms-of-use" target="_blank" rel="noopener">Terms of Use</a> and acknowledge the <a href="/privacy-policy" target="_blank" rel="noopener">Privacy Policy</a>.</label>
             </div>
 
-            <div class="im-actions">
-              <button class="im-btn im-btn--ghost" type="button" data-im-back>Back</button>
-              <button class="im-btn im-btn--primary im-next" id="im-submit" type="submit">Get My Free Quote</button>
-            </div>
-          </section>
+          <div class="im-actions">
+            <button class="im-btn im-btn--primary im-next" id="im-submit" type="submit">Get My Free Quote</button>
+          </div>
         </form>
 
         <div class="im-done" id="im-done">
@@ -1780,19 +1735,12 @@ class Component extends DCLogic {
   if (window.__imQuoteFormBooted) return;
   window.__imQuoteFormBooted = true;
 
-  const MIN_AGE = 50, MAX_AGE = 85;
   const ENDPOINT = "/api/lead";
 
-  // The host page re-renders and swaps these nodes out, so every lookup is
-  // done at the moment it is needed. Nothing is cached.
+  // The host page re-renders and swaps these nodes out, so every lookup
+  // happens when it is needed and every listener is delegated on document.
   const $ = (id) => document.getElementById(id);
   const form = () => $("im-quote-form");
-  const steps = () => [...document.querySelectorAll(".im-step")];
-  const currentStep = () => {
-    const active = steps().find((s) => s.classList.contains("is-active"));
-    return active ? Number(active.dataset.step) : 1;
-  };
-
   const session = { openedAt: Date.now(), interactions: 0, sending: false };
 
   (function loadTrustedForm() {
@@ -1808,26 +1756,6 @@ class Component extends DCLogic {
   const digits = (v) => String(v || "").replace(/\D/g, "");
   const clean = (v, n = 300) => String(v || "").replace(/[<>]/g, "").replace(/\s+/g, " ").trim().slice(0, n);
 
-  function ageOn(dob, now) {
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(dob)) return 0;
-    const [y, m, d] = dob.split("-").map(Number);
-    let age = now.getFullYear() - y;
-    const md = now.getMonth() + 1 - m;
-    if (md < 0 || (md === 0 && now.getDate() < d)) age -= 1;
-    return age > 0 && age < 130 ? age : 0;
-  }
-
-  /** Re-applied on demand: a re-render resets the picker bounds. */
-  function applyDateBounds() {
-    const dob = $("im-dob");
-    if (!dob || dob.dataset.imBounded === "1") return;
-    const now = new Date();
-    const iso = (d) => d.toISOString().slice(0, 10);
-    dob.max = iso(new Date(now.getFullYear() - MIN_AGE, now.getMonth(), now.getDate()));
-    dob.min = iso(new Date(now.getFullYear() - MAX_AGE - 1, now.getMonth(), now.getDate() + 1));
-    dob.dataset.imBounded = "1";
-  }
-
   function showError(message) {
     const box = $("im-error");
     if (!box) return;
@@ -1835,29 +1763,21 @@ class Component extends DCLogic {
     box.classList.add("is-visible");
     box.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
-  function clearError() { $("im-error") && $("im-error").classList.remove("is-visible"); }
-
-  function showStep(n) {
-    const list = steps();
-    const target = Math.max(1, Math.min(list.length, n));
-    list.forEach((s) => s.classList.toggle("is-active", Number(s.dataset.step) === target));
-    const pct = Math.round((target / list.length) * 100);
-    if ($("im-progress-label")) $("im-progress-label").textContent = `Step ${target} of ${list.length}`;
-    if ($("im-progress-pct")) $("im-progress-pct").textContent = pct + "%";
-    if ($("im-progress-fill")) $("im-progress-fill").style.width = pct + "%";
-    clearError();
-  }
 
   const MESSAGES = {
-    date_of_birth: "Please enter your date of birth.",
-    coverage_amount: "Please choose a coverage amount.",
+    first_name: "Please enter your first name.",
+    last_name: "Please enter your last name.",
+    phone_primary: "Please enter your phone number.",
+    email: "Please enter your email address.",
+    state: "Please choose your state.",
+    postal_code: "Please enter your ZIP code.",
     consent: "Please review and accept the consent disclosure."
   };
 
-  function validateStep() {
-    const step = steps().find((s) => s.classList.contains("is-active"));
-    if (!step) return false;
-    for (const field of step.querySelectorAll("[required]")) {
+  function validate() {
+    const f = form();
+    if (!f) return false;
+    for (const field of f.querySelectorAll("[required]")) {
       field.removeAttribute("aria-invalid");
       if (field.type === "checkbox") {
         if (!field.checked) { field.setAttribute("aria-invalid", "true"); showError(MESSAGES.consent); return false; }
@@ -1873,16 +1793,6 @@ class Component extends DCLogic {
         field.setAttribute("aria-invalid", "true");
         showError("Please review the highlighted field.");
         field.focus();
-        return false;
-      }
-    }
-    if (currentStep() === 1) {
-      const dob = $("im-dob");
-      const age = ageOn(dob.value, new Date());
-      if (!age) { dob.setAttribute("aria-invalid", "true"); showError(MESSAGES.date_of_birth); return false; }
-      if (age < MIN_AGE || age > MAX_AGE) {
-        dob.setAttribute("aria-invalid", "true");
-        showError(`Final expense coverage is written between ages ${MIN_AGE} and ${MAX_AGE}.`);
         return false;
       }
     }
@@ -1918,7 +1828,7 @@ class Component extends DCLogic {
   }
 
   async function submitLead() {
-    if (session.sending || !validateStep()) return;
+    if (session.sending || !validate()) return;
 
     if (($("im-company-website") && $("im-company-website").value) ||
         Date.now() - session.openedAt < 4000 || session.interactions < 2) {
@@ -1983,19 +1893,8 @@ class Component extends DCLogic {
     }
   }
 
-  // ---- delegated listeners. These survive the host page replacing the form.
-  document.addEventListener("click", (event) => {
-    if (!event.target.closest) return;
-    if (event.target.closest("[data-im-next]")) { event.preventDefault(); if (validateStep()) showStep(currentStep() + 1); return; }
-    if (event.target.closest("[data-im-back]")) { event.preventDefault(); showStep(currentStep() - 1); }
-  });
-
   document.addEventListener("submit", (event) => {
     if (event.target && event.target.id === "im-quote-form") { event.preventDefault(); submitLead(); }
-  });
-
-  document.addEventListener("focusin", (event) => {
-    if (event.target && event.target.id === "im-dob") applyDateBounds();
   });
 
   document.addEventListener("input", (event) => {
@@ -2012,8 +1911,7 @@ class Component extends DCLogic {
     }
   });
 
-  // Re-apply anything a re-render wipes, then stop watching once settled.
-  const settle = () => { applyDateBounds(); populateTracking(); };
+  const settle = () => populateTracking();
   settle();
   const observer = new MutationObserver(settle);
   observer.observe(document.documentElement, { childList: true, subtree: true });
