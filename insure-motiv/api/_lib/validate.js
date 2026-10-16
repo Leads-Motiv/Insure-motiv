@@ -92,7 +92,7 @@ function normalizeLead(body, context) {
     phone_primary: normalizePhone(source.phone_primary),
     cert: clean(source.cert || source.Cert || source.trustedform_cert_url, 1000),
     consent_checkbox_checked: consentChecked,
-    company_website: clean(source.company_website, 200),
+    company_website: clean(source.im_verify_token ?? source.company_website, 200),
     subID1: clean(source.subID1 || source.utm_source, 180),
     subID2: clean(source.subID2 || source.utm_campaign, 180),
     subID3: clean(source.subID3 || source.utm_content, 180),
