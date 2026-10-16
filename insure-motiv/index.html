@@ -691,7 +691,7 @@
           <input type="hidden" name="submission_id" id="im-submission-id">
           <input type="hidden" name="idempotency_key" id="im-idempotency-key">
           <input type="hidden" name="page_name" value="final_expense_landing">
-          <input type="hidden" name="page_version" value="IM-FE-V2.1.0">
+          <input type="hidden" name="page_version" value="IM-FE-V2.2.0">
           <input type="hidden" name="cert" id="im-cert">
           <input type="hidden" name="landing_page_url" id="im-page-url">
           <input type="hidden" name="referrer" id="im-referrer">
@@ -1729,6 +1729,7 @@ class Component extends DCLogic {
 </script>
 
 
+<script src="/browser-guard-policy.js"></script>
 <script id="im-quote-form-js">
 (() => {
   "use strict";
@@ -1818,6 +1819,38 @@ class Component extends DCLogic {
     set("im-utm-content", clean(q.get("utm_content"), 180));
   }
 
+  // Set by /browser-guard-policy.js. Anything other than "enforce" (including
+  // a policy file that failed to load) records the trigger and lets it through.
+  const guardsEnforced = () => window.InsureMotivBrowserGuards?.mode === "enforce";
+
+  function reportBrowserRejection(reasonCodes) {
+    // Whitelist only diagnostic fields; never send the form or honeypot value.
+    let timer;
+    try {
+      const q = new URLSearchParams(location.search);
+      const sourceTag = clean(q.get("subID1") || q.get("utm_source"), 180) || "Motiv";
+      const controller = new AbortController();
+      timer = window.setTimeout(() => controller.abort(), 2000);
+      void fetch("/api/rejection", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        keepalive: true,
+        signal: controller.signal,
+        body: JSON.stringify({
+          reason_codes: reasonCodes,
+          guard_mode: guardsEnforced() ? "enforce" : "log-only",
+          lead_id: (crypto.randomUUID && crypto.randomUUID()) || undefined,
+          source_tag: /^[a-zA-Z0-9_-]{1,180}$/.test(sourceTag) && !/^\d{7,}$/.test(sourceTag) ? sourceTag : null,
+          page: "index"
+        })
+      }).catch(() => {}).finally(() => window.clearTimeout(timer));
+    } catch {
+      window.clearTimeout(timer);
+      // Reporting must not prevent the existing rejection message or retry.
+    }
+  }
+
   async function idempotencyKey(submissionId, phone, email) {
     const source = `${submissionId}|${phone}|${email}`;
     if (window.crypto && window.crypto.subtle && window.TextEncoder) {
@@ -1830,10 +1863,16 @@ class Component extends DCLogic {
   async function submitLead() {
     if (session.sending || !validate()) return;
 
-    if (($("im-verify-token") && $("im-verify-token").value) ||
-        Date.now() - session.openedAt < 4000 || session.interactions < 2) {
-      showError("Your request could not be verified. Please refresh and try again.");
-      return;
+    const rejectionReasons = [];
+    if ($("im-verify-token") && $("im-verify-token").value) rejectionReasons.push("honeypot_filled");
+    if (Date.now() - session.openedAt < 4000) rejectionReasons.push("submitted_too_fast");
+    if (session.interactions < 2) rejectionReasons.push("insufficient_interaction");
+    if (rejectionReasons.length) {
+      reportBrowserRejection(rejectionReasons);
+      if (guardsEnforced()) {
+        showError("Your request could not be verified. Please refresh and try again.");
+        return;
+      }
     }
 
     const cert = syncCertificate();
@@ -1859,6 +1898,9 @@ class Component extends DCLogic {
     const raw = Object.fromEntries(new FormData(form()).entries());
     const payload = {
       ...raw,
+      // Log-only lets a filled honeypot through; the server still rejects one
+      // on direct posts, so clear it only when the browser chose not to block.
+      im_verify_token: guardsEnforced() ? raw.im_verify_token : "",
       phone_primary: phone,
       email,
       postal_code: digits(raw.postal_code).slice(0, 5),

@@ -11,6 +11,42 @@ form, the TrustedForm loader and the consent block live in `index.html` only, so
 
 ---
 
+## [2.2.0] — 2026-10-16
+
+**Browser guards are log-only, and rejected attempts are recorded.**
+
+### Why
+
+The form's three anti-bot guards (filled honeypot, submitted in under four
+seconds, fewer than two input events) blocked submissions silently: nothing
+recorded how often they fired, or whether real people were being turned away
+by autofill. Server-side rejections (validation, duplicates, TrustedForm) were
+not recorded either. This matches what Champion has run since October 16.
+
+### What changed
+
+| File | What changed |
+|---|---|
+| `browser-guard-policy.js` | **New.** The one switch: `mode: "log-only"`. Served `no-store`. |
+| `index.html` | Guards report to `/api/rejection`, then continue unless the mode is `"enforce"`. A missing policy file behaves as log-only. In log-only mode the honeypot is cleared from the outgoing lead. `page_version` → `IM-FE-V2.2.0`. |
+| `api/rejection.js` | **New.** Browser guard telemetry. Same-origin JSON only, 2 KiB cap, three known reason codes. Log-only events get an `_observed` suffix. |
+| `api/_lib/lead-rejection.js` | **New.** Copied from Champion. Best-effort write to Supabase `fact_lead_rejection` after the response is sent; whitelisted fields only, no contact data. |
+| `api/lead.js` | Records validation, honeypot, duplicate, TrustedForm and pipeline failures, with the stage they happened at. No change to any response. |
+| `package.json` | Adds `@vercel/functions` 3.9.11 (pinned) for `waitUntil`. |
+
+Rows use `property = 'insure-motiv'`. Writes happen only when `VERCEL_ENV` is
+`production` **and** `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` are set on the
+Vercel project; otherwise each attempt logs `supabase_rejection_skipped` and
+nothing else changes.
+
+### To turn blocking back on
+
+Change `browser-guard-policy.js` to `mode: "enforce"`, run `npm test`, commit,
+deploy, reload. Open tabs keep the mode they loaded. The server still rejects a
+populated honeypot on any direct post, in either mode.
+
+---
+
 ## [2.0.0] — 2026-10-15
 
 **The final expense form is native, and the page now certifies consent.**

@@ -15,6 +15,7 @@ const { deliverSio } = require("./_lib/sio");
 const { deliverGhl } = require("./_lib/ghl");
 const { createStore } = require("./_lib/store");
 const { IdempotencyService } = require("./_lib/idempotency");
+const { scheduleLeadRejection } = require("./_lib/lead-rejection");
 
 const MAX_BODY_BYTES = 64 * 1024;
 
@@ -140,10 +141,22 @@ function createHandler(dependencies = {}) {
     let idempotency;
     let claimed = false;
     let redisFailOpen = false;
+    let rejectionStage = "validation";
 
     const transition = (state, hop, detail, level) => {
       const item = logTransition({ leadId, state, hop, detail, level, logger });
       transitions.push({ timestamp: item.timestamp, state, hop, detail: item.detail });
+    };
+
+    // Called only after the response is sent; capture never changes the outcome.
+    const recordRejection = (reasonCode, reasonDetail, stage) => {
+      scheduleLeadRejection({
+        property: "insure-motiv", leadId, reasonCode, reasonDetail, stage,
+        sourceTag: lead?.subID1 || config.sio.sourceIdFallback,
+        landingPageUrl: lead?.page_url,
+        zip: lead?.postal_code, state: lead?.state,
+        env, fetchImpl, logger, waitUntilImpl: dependencies.waitUntilImpl
+      });
     };
 
     try {
@@ -175,6 +188,7 @@ function createHandler(dependencies = {}) {
         transition(STATES.CAPTURED, "idempotency", { warning: "redis_not_configured_fail_open" }, "warn");
       }
 
+      rejectionStage = "dedup";
       let claim;
       try {
         claim = await idempotency.claim({
@@ -202,16 +216,20 @@ function createHandler(dependencies = {}) {
       if (claim.status === "DUPLICATE") {
         leadId = claim.leadId || leadId;
         transition(STATES.DUPLICATE, "dedup", { lookback_days: config.dedupLookbackDays });
-        return sendJson(res, 200, {
+        sendJson(res, 200, {
           success: true,
           lead_id: leadId,
           state: STATES.DUPLICATE,
           duplicate: true
         });
+        recordRejection("duplicate", "Contact already exists within the deduplication window.", "dedup");
+        return;
       }
       claimed = claim.status === "CLAIMED";
 
+      rejectionStage = "trustedform";
       await verifyTrustedForm(lead, config.trustedForm, fetchImpl);
+      rejectionStage = "sio";
       transition(STATES.TF_RETAINED, "trustedform", { retained: true, matched: true });
 
       const consentText = config.sio.tcpaConsentTextByPage[lead.page];
@@ -333,7 +351,11 @@ function createHandler(dependencies = {}) {
       if (claimed && idempotency?.enabled) {
         try { await idempotency.cacheResult(leadId, { http_status: status, body }); } catch { /* logging already occurred */ }
       }
-      return sendJson(res, status, body);
+      sendJson(res, status, body);
+      recordRejection(body.code,
+        known && error.fields.length ? `Invalid fields: ${error.fields.join(", ")}` : body.message,
+        body.code.startsWith("trustedform_") ? "trustedform" : rejectionStage);
+      return;
     }
   };
 }
