@@ -699,8 +699,8 @@
           <input type="hidden" name="utm_campaign" id="im-utm-campaign">
           <input type="hidden" name="utm_content" id="im-utm-content">
           <div aria-hidden="true" style="position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden">
-            <label for="im-company-website">Leave empty</label>
-            <input id="im-company-website" name="company_website" tabindex="-1" autocomplete="off">
+            <label for="im-verify-token">Leave empty</label>
+            <input id="im-verify-token" name="im_verify_token" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
           </div>
 
           <div class="im-row">
@@ -1830,7 +1830,7 @@ class Component extends DCLogic {
   async function submitLead() {
     if (session.sending || !validate()) return;
 
-    if (($("im-company-website") && $("im-company-website").value) ||
+    if (($("im-verify-token") && $("im-verify-token").value) ||
         Date.now() - session.openedAt < 4000 || session.interactions < 2) {
       showError("Your request could not be verified. Please refresh and try again.");
       return;
@@ -1895,6 +1895,13 @@ class Component extends DCLogic {
 
   document.addEventListener("submit", (event) => {
     if (event.target && event.target.id === "im-quote-form") { event.preventDefault(); submitLead(); }
+  });
+
+  // "change" as well as "input": some mobile autofill paths fire only
+  // change, which would leave the counter at 0 and reject a real submission.
+  document.addEventListener("change", (event) => {
+    const el = event.target;
+    if (el && el.closest && el.closest("#im-quote-form")) session.interactions += 1;
   });
 
   document.addEventListener("input", (event) => {
