@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A Prescription Delivery Programme | RX Delivery</title>
+<meta name="description" content="A pharmacy that delivers your prescriptions in pre-sorted packets and handles refills and renewals. See whether you qualify.">
+<!-- One of four offer pages. Not for search: it is reached from a form, and
+     the standalone page is the one that should rank. -->
+<meta name="robots" content="noindex, follow">
+<base href="/">
+<style>
+  @font-face { font-family: 'Public Sans'; font-style: normal; font-weight: 400 700;
+    font-display: swap; src: url("assets/public-sans-latin.woff2") format('woff2'); }
+  @font-face { font-family: 'Source Serif 4'; font-style: normal; font-weight: 400 700;
+    font-display: swap; src: url("assets/source-serif-latin.woff2") format('woff2'); }
+
+  :root {
+    --navy: #12304F; --teal: #0D6E63; --teal-dark: #0A574E; --teal-pale: #E3F1EC;
+    --cream: #FBF8F4; --line: #E7E0D6; --body: #40515C; --muted: #5C6B76;
+    --warn-bg: #FDECEA; --warn-ink: #8C1D18; --warn-line: #B3261E;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--cream); color: #1E2A33;
+    font-family: 'Public Sans', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased; }
+  a { color: var(--teal); }
+  h1, h2, h3 { font-family: 'Source Serif 4', Georgia, serif; color: var(--navy); margin: 0; }
+
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 48px); }
+  .section { padding: clamp(46px, 6vw, 86px) 0; }
+  .section--white { background: #FFFFFF; border-top: 1px solid #EFE8DE; }
+  .eyebrow { font-size: 13px; font-weight: 700; letter-spacing: 1.4px;
+    text-transform: uppercase; color: var(--teal); margin: 0; }
+  .lead { font-size: clamp(18px, 1.5vw, 20px); line-height: 1.6; color: var(--body); margin: 0; }
+  h2 { font-size: clamp(29px, 3.3vw, 42px); line-height: 1.15; letter-spacing: -1px; }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center;
+    min-height: 60px; padding: 0 36px; border: 0; border-radius: 999px;
+    background: var(--teal); color: #FFFFFF; font: inherit; font-size: 19px;
+    font-weight: 700; text-decoration: none; cursor: pointer; }
+  .btn:hover { background: var(--teal-dark); }
+  .btn--block { width: 100%; }
+
+  /* hero */
+  .hero { background: linear-gradient(180deg, #FFFFFF 0%, var(--cream) 100%);
+    padding: clamp(34px, 4.5vw, 60px) 0 clamp(40px, 5vw, 68px); }
+  .hero-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+    gap: clamp(28px, 4vw, 54px); align-items: start; }
+  .hero h1 { font-size: clamp(36px, 5vw, 58px); line-height: 1.07; letter-spacing: -1.3px; }
+  .hero-copy { display: flex; flex-direction: column; gap: 20px; max-width: 620px; }
+  .ticks { list-style: none; margin: 0; padding: 0; display: grid; gap: 11px; }
+  .ticks li { position: relative; padding-left: 32px; font-size: 17px;
+    line-height: 1.5; color: var(--navy); font-weight: 600; }
+  .ticks li::before { content: "✓"; position: absolute; left: 0; top: 0;
+    display: grid; place-items: center; width: 23px; height: 23px; border-radius: 50%;
+    background: var(--teal-pale); color: var(--teal); font-size: 13px; font-weight: 700; }
+
+  /* cards */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: clamp(16px, 2vw, 22px); }
+  .card { background: #FFFFFF; border: 1px solid var(--line); border-radius: 18px;
+    padding: 26px 24px; display: flex; flex-direction: column; gap: 10px; }
+  .card h3 { font-size: 21px; line-height: 1.25; }
+  .card p { margin: 0; font-size: 16.5px; line-height: 1.55; color: var(--body); }
+  .step-no { display: grid; place-items: center; width: 50px; height: 50px;
+    border-radius: 999px; background: var(--navy); color: #FFFFFF;
+    font-family: 'Source Serif 4', Georgia, serif; font-size: 24px; font-weight: 700; }
+
+  /* eligibility */
+  .elig { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    gap: clamp(18px, 2.4vw, 30px); }
+  .elig ul { margin: 10px 0 0; padding-left: 22px; }
+  .elig li { font-size: 16.5px; line-height: 1.6; color: var(--body); margin-bottom: 8px; }
+
+  .note { border-left: 3px solid var(--teal); background: #FFFFFF;
+    padding: 18px 20px; border-radius: 0 12px 12px 0; }
+  .note p { margin: 0; font-size: 16px; line-height: 1.6; color: var(--body); }
+
+  /* form */
+  .form-card { background: #FFFFFF; border: 1px solid var(--line); border-radius: 22px;
+    padding: clamp(22px, 3vw, 32px); box-shadow: 0 18px 44px rgba(18, 48, 79, .10);
+    display: flex; flex-direction: column; gap: 16px; max-width: 520px; width: 100%; }
+  .rx-form { display: flex; flex-direction: column; gap: 14px; }
+  .row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .field label { font-size: 13px; font-weight: 800; color: var(--navy); }
+  .field input, .field select { width: 100%; min-height: 52px; padding: 12px 14px;
+    font: inherit; font-size: 16px; color: var(--navy); background: #FFFFFF;
+    border: 1px solid #CBBFAE; border-radius: 10px; outline: none; }
+  .field input:focus, .field select:focus { border-color: var(--navy);
+    box-shadow: 0 0 0 3px rgba(18, 48, 79, .14); }
+  .field [aria-invalid="true"] { border-color: var(--warn-line);
+    box-shadow: 0 0 0 3px rgba(179, 38, 30, .12); }
+
+  .consent { display: flex; gap: 10px; align-items: flex-start; padding: 13px;
+    border: 1px solid var(--line); border-radius: 12px; background: var(--cream); }
+  .consent input { flex: 0 0 auto; width: 19px; height: 19px; margin-top: 2px;
+    accent-color: var(--navy); }
+  .consent label { font-size: 12px; line-height: 1.55; color: var(--muted); }
+
+  /* Visible while the wording is unsigned. Removing this is part of go-live,
+     together with the provider name in the consent text. */
+  .draft { margin: 0; padding: 9px 12px; border-left: 3px solid var(--warn-line);
+    border-radius: 0 8px 8px 0; background: var(--warn-bg); color: var(--warn-ink);
+    font-size: 12px; font-weight: 700; line-height: 1.45; }
+
+  .alert { display: none; padding: 11px 13px; border-radius: 10px;
+    background: var(--warn-bg); color: var(--warn-ink); font-size: 14px;
+    font-weight: 700; line-height: 1.45; }
+  .alert.is-visible { display: block; }
+
+  .done { display: none; text-align: center; padding: 10px 0 4px; }
+  .done.is-visible { display: block; }
+  .done-tick { display: grid; place-items: center; width: 60px; height: 60px;
+    margin: 0 auto 14px; border-radius: 50%; background: var(--teal-pale);
+    color: var(--teal); font-size: 27px; font-weight: 900; }
+  .done h3 { font-size: 24px; margin-bottom: 7px; }
+  .done p { margin: 0; font-size: 15.5px; line-height: 1.55; color: var(--muted); }
+
+  /* footer */
+  footer { background: var(--navy); color: #DCE7EF; padding: 36px 0 30px;
+    font-size: 13px; line-height: 1.7; }
+  footer p { margin: 0 0 12px; max-width: 980px; }
+  footer a { color: #FFFFFF; text-decoration: underline; }
+
+  @media (max-width: 560px) { .row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header style="background:#FFFFFF;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;">
+  <div class="wrap" style="display:flex;align-items:center;justify-content:space-between;gap:20px;padding-top:15px;padding-bottom:15px;flex-wrap:wrap;">
+    <a href="/" style="display:flex;align-items:center;gap:12px;text-decoration:none;">
+      <span style="width:40px;height:40px;border-radius:12px;background:var(--navy);display:grid;place-items:center;color:#FFFFFF;font-family:'Source Serif 4',Georgia,serif;font-weight:700;font-size:19px;">RX</span>
+      <span style="display:flex;flex-direction:column;line-height:1.15;">
+        <span style="font-family:'Source Serif 4',Georgia,serif;font-size:22px;font-weight:700;color:var(--navy);">RX Delivery</span>
+        <span style="font-size:11.5px;font-weight:600;letter-spacing:.9px;text-transform:uppercase;color:var(--teal);">Prescription home delivery</span>
+      </span>
+    </a>
+    <a class="btn" href="#optin" style="min-height:48px;padding:0 24px;font-size:17px;">See If You Qualify</a>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">Another programme to consider</p>
+        <h1>A Different Programme That May Suit You</h1>
+        <p class="lead">We were not able to match your request to a final expense provider this time. A separate programme may still be useful: a pharmacy that delivers prescriptions to your door in pre-sorted packets and handles refills and renewals for you. It has its own requirements, unconnected to your earlier answers.</p>
+        <ul class="ticks">
+          <li>Pre-sorted, easy-tear packets, labelled by date and time</li>
+          <li>Refills and renewals arranged with your doctor for you</li>
+          <li>Delivered to your home, at no additional cost to you</li>
+        </ul>
+        <p style="margin:0;font-size:15px;line-height:1.6;color:var(--muted);">You continue to pay your usual prescription co-pays. The pharmacy decides who it can take on, so opting in here is not enrolment. <a href="https://rxdelivery.example/?source_campaign=fe&source_path=declined">Learn more about the programme</a>.</p>
+      </div>
+
+      <div id="optin" class="form-card">
+        <div style="display:flex;flex-direction:column;gap:7px;">
+          <h2 style="font-size:clamp(25px,2.5vw,30px);line-height:1.15;letter-spacing:-.6px;">See If You Qualify</h2>
+          <p style="margin:0;font-size:16.5px;line-height:1.5;color:var(--muted);">A specialist reviews your details and calls you to check a few things. No obligation.</p>
+        </div>
+
+        <form class="rx-form" id="rx-form" novalidate>
+          <div class="alert" id="rx-error" role="alert" aria-live="assertive"></div>
+
+          <input type="hidden" name="submission_id" id="rx-submission-id">
+          <input type="hidden" name="idempotency_key" id="rx-idempotency-key">
+          <input type="hidden" name="page_name" value="rx_fe_declined">
+          <input type="hidden" name="page_version" value="RX-V0.1.0">
+          <input type="hidden" name="cert" id="rx-cert">
+          <input type="hidden" name="landing_page_url" id="rx-page-url">
+          <input type="hidden" name="referrer" id="rx-referrer">
+          <!-- Attribution. source_campaign and source_path identify which funnel
+               and which outcome sent the visitor here; they survive a Learn More
+               click because the funnel pages pass them in the query string. -->
+          <input type="hidden" name="source_campaign" id="rx-source-campaign" value="fe">
+          <input type="hidden" name="source_path" id="rx-source-path" value="declined">
+          <input type="hidden" name="utm_source" id="rx-utm-source">
+          <input type="hidden" name="utm_medium" id="rx-utm-medium">
+          <input type="hidden" name="utm_campaign" id="rx-utm-campaign">
+          <input type="hidden" name="utm_content" id="rx-utm-content">
+          <input type="hidden" name="utm_term" id="rx-utm-term">
+          <input type="hidden" name="gclid" id="rx-gclid">
+
+          <div aria-hidden="true" style="position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden">
+            <label for="rx-verify-token">Leave empty</label>
+            <input id="rx-verify-token" name="rx_verify_token" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
+          </div>
+
+          <div class="row">
+            <div class="field"><label for="rx-first">First name</label>
+              <input type="text" id="rx-first" name="first_name" autocomplete="given-name" required></div>
+            <div class="field"><label for="rx-last">Last name</label>
+              <input type="text" id="rx-last" name="last_name" autocomplete="family-name" required></div>
+            <div class="field"><label for="rx-phone">Phone number</label>
+              <input type="tel" id="rx-phone" name="phone_primary" autocomplete="tel-national" inputmode="tel" required></div>
+            <div class="field"><label for="rx-email">Email address</label>
+              <input type="email" id="rx-email" name="email" autocomplete="email" required></div>
+            <div class="field"><label for="rx-state">State</label>
+              <select id="rx-state" name="state" autocomplete="address-level1" required>
+                <option value="">Select</option><option>AL</option><option>AK</option><option>AZ</option><option>AR</option><option>CA</option><option>CO</option><option>CT</option><option>DE</option><option>DC</option><option>FL</option><option>GA</option><option>HI</option><option>ID</option><option>IL</option><option>IN</option><option>IA</option><option>KS</option><option>KY</option><option>LA</option><option>ME</option><option>MD</option><option>MA</option><option>MI</option><option>MN</option><option>MS</option><option>MO</option><option>MT</option><option>NE</option><option>NV</option><option>NH</option><option>NJ</option><option>NM</option><option>NY</option><option>NC</option><option>ND</option><option>OH</option><option>OK</option><option>OR</option><option>PA</option><option>RI</option><option>SC</option><option>SD</option><option>TN</option><option>TX</option><option>UT</option><option>VT</option><option>VA</option><option>WA</option><option>WV</option><option>WI</option><option>WY</option>
+              </select></div>
+            <div class="field"><label for="rx-zip">ZIP code</label>
+              <input type="text" id="rx-zip" name="postal_code" inputmode="numeric" autocomplete="postal-code" maxlength="5" required></div>
+          </div>
+
+          <!-- PLACEHOLDER until Keith supplies and signs off the wording, and
+               names the pharmacy. The server refuses to deliver while the
+               marker below is still present, so nothing can go out on
+               unapproved wording. -->
+          <p class="draft" data-rx-consent-draft>
+            Draft wording &mdash; awaiting sign-off and the pharmacy&rsquo;s legal name.
+            Opt-ins are held rather than delivered until this is replaced.
+          </p>
+
+          <div class="consent">
+            <input type="checkbox" id="rx-consent" name="consent" value="yes" required>
+            <label for="rx-consent">By checking this box and clicking &ldquo;See If I Qualify,&rdquo; I provide my electronic signature and consent to receive telephone calls, including calls made using automated dialing technology, an artificial voice, or a prerecorded message, from [PROVIDER LEGAL NAME] regarding prescription home delivery, at the telephone number I provided. I understand these calls may be placed even if my number appears on a Do Not Call registry, and that consent is not required as a condition of any purchase. I agree to the <a href="/terms-of-use" target="_blank" rel="noopener">Terms of Use</a> and acknowledge the <a href="/privacy-policy" target="_blank" rel="noopener">Privacy Policy</a>.</label>
+          </div>
+
+          <button class="btn btn--block" id="rx-submit" type="submit">See If I Qualify</button>
+        </form>
+
+        <div class="done" id="rx-done">
+          <div class="done-tick" aria-hidden="true">✓</div>
+          <h3>Your request is in</h3>
+          <p>A specialist will call you to check a few details and, if the pharmacy can help, connect you to get started.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--white">
+    <div class="wrap" style="display:flex;flex-direction:column;gap:clamp(20px,2.6vw,28px);">
+      <div style="max-width:760px;display:flex;flex-direction:column;gap:12px;">
+        <p class="eyebrow">Who qualifies</p>
+        <h2>What the Pharmacy Needs to See</h2>
+        <p class="lead">A specialist checks these with you on the phone.</p>
+      </div>
+      <div class="elig">
+        <div>
+          <h3 style="font-size:20px;">Your coverage</h3>
+          <ul>
+            <li>An active Medicare prescription drug plan</li>
+            <li>A plan the pharmacy works with &mdash; a few carriers are not supported</li>
+          </ul>
+        </div>
+        <div>
+          <h3 style="font-size:20px;">Your medications</h3>
+          <ul>
+            <li>At least eight different prescription medications</li>
+            <li>Over-the-counter items do not count; prescribed inhalers, insulin, eye drops and vitamins do</li>
+          </ul>
+        </div>
+        <div>
+          <h3 style="font-size:20px;">Your situation</h3>
+          <ul>
+            <li>Able to make your own medical decisions, or someone with power of attorney on the call</li>
+            <li>Living at home rather than in a nursing home or assisted living facility</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note">
+        <p><strong>This is a separate programme.</strong> Its requirements are set by the pharmacy and have nothing to do with the request you just made. Opting in does not mean you are enrolled. <a href="https://rxdelivery.example/?source_campaign=fe&source_path=declined">Read more about how it works</a>.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p><strong>Important:</strong> RX Delivery is a marketing service that connects consumers with a participating pharmacy. We are not a pharmacy, an insurer or a health plan, and we do not fill prescriptions, decide eligibility or set co-pays. Enrolment, eligibility and all clinical and dispensing decisions are made by the pharmacy under its own rules.</p>
+    <p>We are not affiliated with Medicare, Medicaid, the Social Security Administration or any government agency. This is not an offer of insurance and submitting your details is not an application for coverage. Availability varies by plan, carrier, medication list and state.</p>
+    <p>You remain responsible for your prescription co-pays.</p>
+    <p style="margin-bottom:0;">
+      <a href="/privacy-policy">Privacy Policy</a> &nbsp;&middot;&nbsp;
+      <a href="/terms-of-use">Terms of Use</a> &nbsp;&middot;&nbsp;
+      <span>&copy; <span data-year>2026</span> RX Delivery</span>
+    </p>
+  </div>
+</footer>
+
+<script>
+(() => {
+  "use strict";
+  const ENDPOINT = "/api/lead";
+  const $ = (id) => document.getElementById(id);
+  const session = { openedAt: Date.now(), interactions: 0, sending: false };
+
+  document.querySelector("[data-year]").textContent = String(new Date().getFullYear());
+
+  // TrustedForm certifies the consent, in the document the consumer typed into.
+  (function loadTrustedForm() {
+    if (document.querySelector('script[src*="trustedform"]')) return;
+    const s = document.createElement("script");
+    s.async = true;
+    s.src = "https://api.trustedform.com/trustedform.js?provide_referrer=false&field=" +
+      encodeURIComponent("xxTrustedFormCertUrl") + "&l=" + Date.now() + Math.random() +
+      "&invert_field_sensitivity=false";
+    document.head.appendChild(s);
+  })();
+
+  const digits = (v) => String(v || "").replace(/\D/g, "");
+  const clean = (v, n = 300) => String(v || "").replace(/[<>]/g, "").replace(/\s+/g, " ").trim().slice(0, n);
+
+  function showError(message) {
+    const box = $("rx-error");
+    box.textContent = message;
+    box.classList.add("is-visible");
+    box.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  const MESSAGES = {
+    first_name: "Please enter your first name.",
+    last_name: "Please enter your last name.",
+    phone_primary: "Please enter your phone number.",
+    email: "Please enter your email address.",
+    state: "Please choose your state.",
+    postal_code: "Please enter your ZIP code.",
+    consent: "Please review and accept the consent disclosure."
+  };
+
+  function validate() {
+    const form = $("rx-form");
+    for (const field of form.querySelectorAll("[required]")) {
+      field.removeAttribute("aria-invalid");
+      if (field.type === "checkbox") {
+        if (!field.checked) {
+          field.setAttribute("aria-invalid", "true");
+          showError(MESSAGES.consent);
+          field.closest(".consent").scrollIntoView({ behavior: "smooth", block: "center" });
+          return false;
+        }
+        continue;
+      }
+      if (!String(field.value || "").trim() || !field.checkValidity()) {
+        field.setAttribute("aria-invalid", "true");
+        showError(MESSAGES[field.name] || "Please review the highlighted field.");
+        field.focus();
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /* Attribution. The funnel pages link here carrying which campaign and which
+     outcome sent the visitor, so a Learn More click does not lose it. */
+  function populateTracking() {
+    const q = new URLSearchParams(location.search);
+    const set = (id, value) => { if ($(id)) $(id).value = value; };
+    set("rx-page-url", location.href);
+    set("rx-referrer", document.referrer);
+    set("rx-source-campaign", clean(q.get("source_campaign"), 60));
+    set("rx-source-path", clean(q.get("source_path"), 30));
+    for (const key of ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "gclid"]) {
+      set("rx-" + key.replace(/_/g, "-"), clean(q.get(key), 180));
+    }
+  }
+
+  async function idempotencyKey(submissionId, phone, email) {
+    const source = `${submissionId}|${phone}|${email}`;
+    if (window.crypto?.subtle && window.TextEncoder) {
+      const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(source));
+      return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+    }
+    return btoa(source).replace(/[^A-Za-z0-9]/g, "").slice(0, 64);
+  }
+
+  function certificate() {
+    const field = [...document.querySelectorAll('input[name^="xxTrustedFormCertUrl"]')]
+      .find((f) => String(f.value || "").trim());
+    const cert = clean(field && field.value, 1000);
+    $("rx-cert").value = cert;
+    return cert;
+  }
+
+  async function submitOptIn() {
+    if (session.sending || !validate()) return;
+
+    if ($("rx-verify-token").value ||
+        Date.now() - session.openedAt < 4000 || session.interactions < 2) {
+      showError("Your request could not be verified. Please refresh and try again.");
+      return;
+    }
+
+    const cert = certificate();
+    if (!cert) {
+      showError("The secure consent certificate is still loading. Please wait a moment and submit again.");
+      return;
+    }
+
+    let phone = digits($("rx-phone").value);
+    if (phone.length === 11 && phone[0] === "1") phone = phone.slice(1);
+    if (!/^[2-9]\d{2}[2-9]\d{6}$/.test(phone)) {
+      showError("Please enter a valid ten-digit U.S. phone number.");
+      return;
+    }
+
+    const email = clean($("rx-email").value, 100).toLowerCase();
+    const submissionId = (crypto.randomUUID && crypto.randomUUID()) ||
+      "rx-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 12);
+    $("rx-submission-id").value = submissionId;
+    $("rx-idempotency-key").value = await idempotencyKey(submissionId, phone, email);
+    populateTracking();
+
+    const raw = Object.fromEntries(new FormData($("rx-form")).entries());
+    const payload = {
+      ...raw,
+      phone_primary: phone,
+      email,
+      postal_code: digits(raw.postal_code).slice(0, 5),
+      state: clean(raw.state, 2).toUpperCase(),
+      consent_checkbox_checked: raw.consent === "yes",
+      trustedform_cert_url: cert
+    };
+
+    const button = $("rx-submit");
+    session.sending = true;
+    button.disabled = true;
+    button.textContent = "Sending…";
+    try {
+      const response = await fetch(ENDPOINT, {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ normalized_lead: payload })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || result.success === false) {
+        throw new Error(result.message || "Your request could not be submitted. Please try again.");
+      }
+      $("rx-form").style.display = "none";
+      $("rx-done").classList.add("is-visible");
+      $("rx-done").scrollIntoView({ behavior: "smooth", block: "nearest" });
+    } catch (error) {
+      showError(error.message || "Your request could not be submitted. Please try again.");
+    } finally {
+      session.sending = false;
+      button.disabled = false;
+      button.textContent = "See If I Qualify";
+    }
+  }
+
+  document.addEventListener("submit", (event) => {
+    if (event.target && event.target.id === "rx-form") { event.preventDefault(); submitOptIn(); }
+  });
+
+  // "change" as well as "input": some mobile autofill paths fire only change.
+  for (const type of ["input", "change"]) {
+    document.addEventListener(type, (event) => {
+      const el = event.target;
+      if (!el.closest || !el.closest("#rx-form")) return;
+      session.interactions += 1;
+      if (el.id === "rx-zip") el.value = digits(el.value).slice(0, 5);
+      if (el.id === "rx-phone") {
+        let d = digits(el.value);
+        if (d.length === 11 && d[0] === "1") d = d.slice(1);
+        d = d.slice(0, 10);
+        el.value = d.length > 6 ? `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`
+          : d.length > 3 ? `(${d.slice(0,3)}) ${d.slice(3)}` : d;
+      }
+    });
+  }
+
+  populateTracking();
+})();
+</script>
+</body>
+</html>
